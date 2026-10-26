@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Build output
+.next/
+out/
+dist/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Local editor and OS files
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Python artifacts
+__pycache__/
+.venv/
+venv/
