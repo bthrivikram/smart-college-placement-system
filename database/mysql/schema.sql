@@ -94,6 +94,7 @@ CREATE TABLE placement_drives (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
         ON UPDATE CURRENT_TIMESTAMP,
+    total_applications INT NOT NULL DEFAULT 0,
 
     CONSTRAINT fk_placement_drives_admin
         FOREIGN KEY (created_by)
@@ -167,3 +168,43 @@ DO
     SET status = 'CLOSED'
     WHERE status = 'OPEN'
       AND application_deadline <= NOW();
+
+
+DELIMITER //
+
+CREATE TRIGGER after_application_insert
+AFTER INSERT ON applications
+FOR EACH ROW
+BEGIN
+    UPDATE placement_drives
+    SET total_applications = total_applications + 1
+    WHERE drive_id = NEW.drive_id;
+END //
+
+DELIMITER ;
+
+CREATE TABLE placement_statistics (
+    statistic_id INT PRIMARY KEY,
+    total_offers INT NOT NULL DEFAULT 0
+);
+
+
+DELIMITER //
+
+CREATE TRIGGER after_application_update_offer_count
+AFTER UPDATE ON applications
+FOR EACH ROW
+BEGIN
+    IF OLD.status <> 'SELECTED' AND NEW.status = 'SELECTED' THEN
+        UPDATE placement_statistics
+        SET total_offers = total_offers + 1
+        WHERE statistic_id = 1;
+
+    ELSEIF OLD.status = 'SELECTED' AND NEW.status <> 'SELECTED' THEN
+        UPDATE placement_statistics
+        SET total_offers = total_offers - 1
+        WHERE statistic_id = 1;
+    END IF;
+END //
+
+DELIMITER ;

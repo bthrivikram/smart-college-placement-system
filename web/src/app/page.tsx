@@ -17,9 +17,9 @@ export default async function Home() {
 
   try {
     const [rows] = await pool.query<OfferCountRow[]>(
-      `SELECT COUNT(*) AS totalOffers
-       FROM applications
-       WHERE status = 'SELECTED'`
+      `SELECT total_offers AS totalOffers
+       FROM placement_statistics
+       WHERE statistic_id = 1`
     );
 
     totalOffers = Number(rows[0]?.totalOffers ?? 0);

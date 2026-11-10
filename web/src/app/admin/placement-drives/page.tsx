@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 
 type Drive = {
   drive_id: number;
+  total_applications: number;
   company_name: string;
   job_role: string;
   job_description: string | null;
@@ -68,7 +69,9 @@ export default function PlacementDrivesPage() {
     const data = await response.json();
 
     if (!response.ok || !data.success) {
-      throw new Error(data.error || data.message || "Could not load placement drives.");
+      throw new Error(
+        data.error || data.message || "Could not load placement drives."
+      );
     }
 
     setDrives(data.drives);
@@ -101,7 +104,7 @@ export default function PlacementDrivesPage() {
 
   function updateField<K extends keyof DriveForm>(
     field: K,
-    value: DriveForm[K],
+    value: DriveForm[K]
   ) {
     setForm((previous) => ({ ...previous, [field]: value }));
   }
@@ -140,13 +143,13 @@ export default function PlacementDrivesPage() {
 
       setSkills((previous) => {
         const alreadyExists = previous.some(
-          (skill) => skill.skill_id === newSkill.skill_id,
+          (skill) => skill.skill_id === newSkill.skill_id
         );
 
         if (alreadyExists) return previous;
 
         return [...previous, newSkill].sort((a, b) =>
-          a.skill_name.localeCompare(b.skill_name),
+          a.skill_name.localeCompare(b.skill_name)
         );
       });
 
@@ -200,20 +203,22 @@ export default function PlacementDrivesPage() {
         body: JSON.stringify(
           editingId === null
             ? payload
-            : { ...payload, driveId: editingId },
+            : { ...payload, driveId: editingId }
         ),
       });
 
       const data = await response.json();
 
       if (!response.ok || !data.success) {
-        throw new Error(data.error || data.message || "Could not save the placement drive.");
+        throw new Error(
+          data.error || data.message || "Could not save the placement drive."
+        );
       }
 
       setMessage(
         editingId === null
           ? "Placement drive created."
-          : "Placement drive updated.",
+          : "Placement drive updated."
       );
 
       resetForm();
@@ -273,7 +278,7 @@ export default function PlacementDrivesPage() {
     try {
       const response = await fetch(
         `/api/admin/placement-drives?driveId=${driveId}`,
-        { method: "DELETE" },
+        { method: "DELETE" }
       );
 
       const data = await response.json();
@@ -285,7 +290,9 @@ export default function PlacementDrivesPage() {
       setMessage("Placement drive deleted.");
       await loadDrives();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not delete the drive.");
+      setError(
+        err instanceof Error ? err.message : "Could not delete the drive."
+      );
     }
   }
 
@@ -346,13 +353,12 @@ export default function PlacementDrivesPage() {
   const filteredSkills = skills.filter((skill) =>
     skill.skill_name
       .toLowerCase()
-      .includes(skillSearch.toLowerCase().trim()),
+      .includes(skillSearch.toLowerCase().trim())
   );
 
   const exactSkillExists = skills.some(
     (skill) =>
-      skill.skill_name.toLowerCase() ===
-      skillSearch.trim().toLowerCase(),
+      skill.skill_name.toLowerCase() === skillSearch.trim().toLowerCase()
   );
 
   return (
@@ -390,10 +396,15 @@ export default function PlacementDrivesPage() {
 
         <section className="mt-8 rounded-xl bg-white p-6 shadow">
           <h2 className="text-xl font-semibold">
-            {editingId === null ? "Create Placement Drive" : "Edit Placement Drive"}
+            {editingId === null
+              ? "Create Placement Drive"
+              : "Edit Placement Drive"}
           </h2>
 
-          <form onSubmit={submitForm} className="mt-5 grid gap-5 md:grid-cols-2">
+          <form
+            onSubmit={submitForm}
+            className="mt-5 grid gap-5 md:grid-cols-2"
+          >
             <label className="block">
               <span className="text-sm font-medium text-gray-700">
                 Company name *
@@ -427,7 +438,9 @@ export default function PlacementDrivesPage() {
               <textarea
                 rows={4}
                 value={form.job_description}
-                onChange={(e) => updateField("job_description", e.target.value)}
+                onChange={(e) =>
+                  updateField("job_description", e.target.value)
+                }
                 className="mt-1 w-full rounded-lg border p-3"
               />
             </label>
@@ -453,7 +466,9 @@ export default function PlacementDrivesPage() {
               </span>
               <input
                 value={form.eligible_department}
-                onChange={(e) => updateField("eligible_department", e.target.value)}
+                onChange={(e) =>
+                  updateField("eligible_department", e.target.value)
+                }
                 placeholder="e.g. CSE, AIML, ISE"
                 className="mt-1 w-full rounded-lg border p-3"
               />
@@ -573,8 +588,8 @@ export default function PlacementDrivesPage() {
                               e.target.checked
                                 ? [...form.skill_ids, skill.skill_id]
                                 : form.skill_ids.filter(
-                                    (id) => id !== skill.skill_id,
-                                  ),
+                                    (id) => id !== skill.skill_id
+                                  )
                             );
                           }}
                           className="h-4 w-4 accent-blue-600"
@@ -625,8 +640,8 @@ export default function PlacementDrivesPage() {
                             updateField(
                               "skill_ids",
                               form.skill_ids.filter(
-                                (id) => id !== skill.skill_id,
-                              ),
+                                (id) => id !== skill.skill_id
+                              )
                             )
                           }
                           className="font-bold hover:text-red-600"
@@ -689,6 +704,11 @@ export default function PlacementDrivesPage() {
                       <h3 className="text-lg font-semibold">
                         {drive.company_name} — {drive.job_role}
                       </h3>
+
+                      {/* Application count maintained by MySQL trigger */}
+                      <p className="mt-2 text-sm font-semibold text-blue-700">
+                        Total applications: {drive.total_applications ?? 0}
+                      </p>
 
                       <p className="mt-1 text-sm text-gray-600">
                         {drive.job_location || "Location not specified"} ·{" "}

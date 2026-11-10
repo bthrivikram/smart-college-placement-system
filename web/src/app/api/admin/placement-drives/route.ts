@@ -5,6 +5,7 @@ import { getSession } from "@/lib/session";
 
 interface DriveRow extends RowDataPacket {
   drive_id: number;
+  total_applications: number;
   company_name: string;
   job_role: string;
   job_description: string | null;
