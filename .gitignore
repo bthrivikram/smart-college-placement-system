@@ -24,3 +24,5 @@ Thumbs.db
 __pycache__/
 .venv/
 venv/
+
+matching-service/.env

@@ -1,0 +1,7 @@
+
+sentence-transformers
+psycopg[binary]
+pypdf
+python-dotenv
+fastapi
+uvicorn
